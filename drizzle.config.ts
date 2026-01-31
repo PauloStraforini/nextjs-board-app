@@ -1,5 +1,5 @@
-import { defineConfig } from "drizzle-kit";
-import { apiEnv } from "./src/api/api-env";
+import { defineConfig } from "drizzle-kit"
+import { apiEnv } from "./src/api/api-env"
 
 export default defineConfig({
   out: "./src/api/db/migrations",
@@ -9,4 +9,4 @@ export default defineConfig({
   dbCredentials: {
     url: apiEnv.DATABASE_URL,
   },
-});
+})
