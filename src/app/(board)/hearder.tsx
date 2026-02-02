@@ -1,19 +1,29 @@
-'use client'
+/** biome-ignore-all lint/performance/noImgElement: <explanation> */
+"use client"
 
 import { Input } from "@/components/input"
-import { LogInIcon, SearchIcon } from "lucide-react"
-import { useQueryState, parseAsString, debounce } from "nuqs"
-import type { ChangeEvent } from "react"
+import { authClient } from "@/lib/auth-client"
+import { Loader2Icon, LogInIcon, SearchIcon } from "lucide-react"
+import { debounce, parseAsString, useQueryState } from "nuqs"
 
 export function Header() {
-    const [search, setSearch] = useQueryState('q', parseAsString.withDefault(''))
+    const { data: session, isPending } = authClient.useSession()
+    const [search, setSearch] = useQueryState("q", parseAsString.withDefault(""))
 
-    function handleSearchUpdate(event: ChangeEvent<HTMLInputElement>) {
+    function handleSearchUpdate(event: React.ChangeEvent<HTMLInputElement>) {
         setSearch(event.target.value, {
-            limitUrlUpdates: event.target.value !== '' ? debounce(500) : undefined
+            limitUrlUpdates:
+                event.target.value.length !== 0 ? debounce(500) : undefined,
         })
     }
 
+    async function handleSignIn() {
+        await authClient.signIn.social({ provider: "github", callbackURL: "/" })
+    }
+
+    async function handleSignOut() {
+        await authClient.signOut()
+    }
 
     return (
         <header className="max-w-225 mx-auto w-full flex items-center justify-between">
@@ -37,12 +47,31 @@ export function Header() {
                     />
                 </div>
 
-                <button
-                    type="button"
-                    className="size-8 rounded-full bg-navy-700 border border-navy-500 flex items-center justify-center hover:bg-navy-600 transition-colors duration-150 cursor-pointer"
-                >
-                    <LogInIcon className="size-3.5 text-red-500" />
-                </button>
+                {isPending ? (
+                    <div className="size-8 rounded-full bg-navy-700 border border-navy-500 flex items-center justify-center">
+                        <Loader2Icon className="size-3.5 text-navy-200 animate-spin" />
+                    </div>
+                ) : session?.user ? (
+                    <button
+                        type="button"
+                        onClick={handleSignOut}
+                        className="size-8 rounded-full overflow-hidden cursor-pointer border-2 border-transparent hover:border-navy-200 transition-colors duration-150"
+                    >
+                        <img
+                            src={session.user.image ?? ""}
+                            alt={session.user.name}
+                            className="size-8 rounded-full"
+                        />
+                    </button>
+                ) : (
+                    <button
+                        type="button"
+                        onClick={handleSignIn}
+                        className="size-8 rounded-full bg-navy-700 border border-navy-500 flex items-center justify-center hover:bg-navy-600 transition-colors duration-150 cursor-pointer"
+                    >
+                        <LogInIcon className="size-3.5 text-green-400" />
+                    </button>
+                )}
             </div>
         </header>
     )
