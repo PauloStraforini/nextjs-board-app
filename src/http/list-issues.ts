@@ -1,8 +1,22 @@
-import { IssuesListResponseSchema } from '@/api/routes/list-issues'
 
-export async function listIssues() {
-    const response = await fetch('http://localhost:3000/api/issues')
-    const data = await response.json()
+import { IssuesListResponseSchema } from "@/api/routes/list-issues"
+import { clientEnv } from "@/env"
 
-    return IssuesListResponseSchema.parse(data)
+interface ListIssuesParams {
+  search?: string
+}
+
+export async function listIssues({ search }: ListIssuesParams = {}) {
+  const url = new URL("/api/issues", clientEnv.NEXT_PUBLIC_API_URL)
+
+  if (search) {
+    url.searchParams.set("search", search)
+  }
+
+  console.log("Fetching issues from:", url.toString())
+
+  const response = await fetch(url)
+  const data = await response.json()
+
+  return IssuesListResponseSchema.parse(data)
 }
