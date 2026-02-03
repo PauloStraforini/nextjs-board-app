@@ -1,10 +1,18 @@
+
 import { Button } from "@/components/button"
 import { getIssue } from "@/http/get-issue"
-import { MoveLeftIcon, ArchiveIcon, ThumbsUpIcon } from "lucide-react"
+import {
+    MoveLeftIcon,
+    ArchiveIcon,
+    ThumbsUpIcon,
+    MessageCirclePlusIcon,
+} from "lucide-react"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { IssueCommentsList } from "./issue-comments/issue-coments-list"
 import { Suspense } from "react"
+import { Input } from "@/components/input"
+import { IssueCommentsList } from "./issue-comments/issue-coments-list"
+import { IssueCommentsSkeleton } from "./issue-comments/issue-coments-skeleton"
 
 interface IssuePageProps {
     params: Promise<{ id: string }>
@@ -35,7 +43,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
     const issue = await getIssue({ id })
 
     return (
-        <main className="max-w-225 mx-auto w-full flex flex-col gap-4 p-6 bg-navy-800 border-[0.5px] border-navy-500 rounded-xl">
+        <main className="max-w-[900px] mx-auto w-full flex flex-col gap-4 p-6 bg-navy-800 border-[0.5px] border-navy-500 rounded-xl">
             <Link
                 href="/"
                 className="flex items-center gap-2 text-navy-200 hover:text-navy-100"
@@ -64,11 +72,24 @@ export default async function IssuePage({ params }: IssuePageProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <span className="font-semibold">
-                    Comments
-                </span>
+                <span className="font-semibold">Comments</span>
+
+                <form className="relative w-full">
+                    <Input
+                        className="bg-navy-700 h-11 pr-24 w-full"
+                        placeholder="Leave a comment..."
+                    />
+                    <button
+                        type="submit"
+                        className="flex items-center gap-2 text-indigo-400 absolute right-3 top-1/2 -translate-y-1/2 text-xs hover:text-indigo-300 cursor-pointer disabled:opacity-50"
+                    >
+                        Publish
+                        <MessageCirclePlusIcon className="size-3" />
+                    </button>
+                </form>
+
                 <div className="mt-3">
-                    <Suspense fallback={<p>Carregando...</p>}>
+                    <Suspense fallback={<IssueCommentsSkeleton />}>
                         <IssueCommentsList issueId={issue.id} />
                     </Suspense>
                 </div>
