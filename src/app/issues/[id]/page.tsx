@@ -4,6 +4,7 @@ import { MoveLeftIcon, ArchiveIcon, ThumbsUpIcon } from "lucide-react"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { IssueCommentsList } from "./issue-comments/issue-coments-list"
+import { Suspense } from "react"
 
 interface IssuePageProps {
     params: Promise<{ id: string }>
@@ -67,7 +68,9 @@ export default async function IssuePage({ params }: IssuePageProps) {
                     Comments
                 </span>
                 <div className="mt-3">
-                    <IssueCommentsList issueId={issue.id} />
+                    <Suspense fallback={<p>Carregando...</p>}>
+                        <IssueCommentsList issueId={issue.id} />
+                    </Suspense>
                 </div>
             </div>
         </main>
